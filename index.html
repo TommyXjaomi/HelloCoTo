@@ -1,0 +1,1108 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Cô Tô</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Audio Element for Background Music -->
+    <audio id="background-music" loop preload="auto">
+        <source src="assets/nhac.mp3" type="audio/mpeg">
+    </audio>
+    <style>
+        /* CSS Clean-up and new album styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --color-coral: #f87171ce;
+            --color-sand: #F7E7CE; 
+            --color-ocean-blue: #3a55a0;
+        }
+        body {
+            font-family: 'Playfair Display', serif;
+            background-image: url('assets/anhnen.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* Container chính */
+        #card-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* Hiệu ứng sóng nhẹ cho tên Minh Ánh */
+        @keyframes wave-motion {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-3px) scale(1.01); }
+        }
+        .ocean-text {
+            color: var(--color-coral);
+            text-shadow: 0 0 12px rgba(248, 113, 113, 0.9);
+            animation: wave-motion 2s infinite ease-in-out alternate;
+        }
+        
+        /* Gradient text: Pink to Blue */
+        .gradient-text {
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            animation: wave-motion 2s infinite ease-in-out alternate;
+        }
+        
+        /* Carousel & Nav styles */
+        .carousel-item { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            transition: opacity 0.5s ease-in-out; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+        .carousel-item.active { 
+            display: block; 
+            opacity: 1; 
+        }
+
+        /* Modal carousel (Portrait 9:16) */
+        #carousel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%; /* Chiếm 70% chiều rộng màn hình */
+            max-width: 550px; /* Tối đa 550px */
+            height: auto;
+            aspect-ratio: 9 / 16;
+            background: black;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @media (min-width: 640px) {
+            #carousel {
+                width: 55%;
+            }
+        }
+        
+        /* Đảm bảo ảnh luôn bao phủ khung 9:16 */
+        .carousel-item.object-cover {
+            object-fit: cover;
+            flex: 1;
+        }
+
+        /* Navigation buttons - positioned outside image */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 101;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-50%) scale(1.12);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+        }
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        #prev-btn { 
+            left: 20px;
+        } 
+        #next-btn { 
+            right: 20px;
+        }
+
+        /* Top control buttons (Close & Settings) */
+        #close-btn, #settings-btn {
+            position: fixed;
+            top: 20px;
+            z-index: 102;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        #close-btn:hover, #settings-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.12);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+        }
+        #close-btn:active, #settings-btn:active {
+            transform: scale(0.95);
+        }
+        #close-btn {
+            right: 20px;
+        }
+        #settings-btn {
+            left: 20px;
+        }
+
+        /* Control bar - positioned below image */
+        #carousel-controls {
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 101; 
+            display: flex; 
+            gap: 8px; 
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 12px 16px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        #carousel-controls button { 
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 16px; 
+            border-radius: 10px; 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+        }
+        #carousel-controls button:hover { 
+            background: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15);
+        }
+        #carousel-controls button:active {
+            transform: translateY(0);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Confetti effect */
+        @keyframes confetti-fall { 
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 
+            100% { transform: translateY(120vh) rotate(480deg); opacity: 0; }
+        }
+        .confetti { 
+            position: fixed; 
+            width: 10px; 
+            height: 14px; 
+            opacity: 0.95; 
+            pointer-events: none; 
+            animation: confetti-fall 2s linear forwards; 
+            z-index: 999;
+        }
+
+        /* Sand Particle Effect (Ánh sáng lấp lánh/hạt cát) */
+        @keyframes sand-fall {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) translateX(var(--drift)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .sand-particle {
+            position: fixed;
+            width: 4px; /* Kích thước nhỏ hơn để trông tinh tế */
+            height: 4px;
+            border-radius: 50%;
+            /* Màu vàng cát lấp lánh */
+            background: radial-gradient(circle at 30% 30%, #FFE6A0, #D4A574);
+            box-shadow: 0 0 4px rgba(212, 165, 116, 0.8);
+            pointer-events: none;
+            animation: sand-fall 8s linear infinite;
+            z-index: 1;
+        }
+
+        /* Image Indicators */
+        #image-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            display: flex;
+            gap: 6px;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .indicator-dot.active {
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        /* Progress Bar */
+        #progress-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            z-index: 15;
+            transition: width 0.1s linear;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease-out;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Settings Modal */
+        #settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #settings-modal.show {
+            display: flex;
+        }
+
+        .settings-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .settings-item {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-item label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .slider {
+            width: 150px;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--color-ocean-blue);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(58, 85, 160, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--color-ocean-blue);
+            cursor: pointer;
+            border: none;
+        }
+
+        .toggle-btn {
+            width: 50px;
+            height: 28px;
+            background: #ccc;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .toggle-btn.active {
+            background: var(--color-ocean-blue);
+        }
+
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active::after {
+            left: 24px;
+        }
+
+        /* Loading Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #1a1a2e;
+        }
+
+        body.dark-mode #carousel {
+            background: #16213e;
+        }
+
+        body.dark-mode .settings-content {
+            background: rgba(30, 30, 30, 0.95);
+            color: white;
+        }
+
+        body.dark-mode .settings-item label {
+            color: #fff;
+        }
+
+        /* Double Tap */
+        .carousel-item {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Glass Morphism Container for Entrance Messages */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            max-width: 500px;
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .glass-container h2 {
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .glass-container p {
+            margin-bottom: 30px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="w-screen h-screen">
+
+    <!-- Container Chính -->
+    <div id="card-container" class="w-screen h-screen flex flex-col">
+
+        <!-- Màn hình Chào đón (Entrance) -->
+        <div id="entrance-screen" class="w-full h-full flex flex-col items-center justify-center text-center transition-opacity duration-700 ease-out p-4 sm:p-6">
+            <!-- Glass Morphism Container -->
+            <div class="glass-container">
+                <h2 class="text-5xl sm:text-6xl font-bold gradient-text">From Cô Tô with love</h2>
+                <p class="text-white">_tmanh410_</p>
+                <button id="open-card-btn" class="px-12 py-3 bg-white bg-opacity-20 backdrop-blur-md border border-white border-opacity-30 text-white font-bold rounded-full hover:bg-opacity-30 shadow-2xl text-base sm:text-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1 active:translate-y-0">
+                    Bắt Đầu
+                </button>
+            </div>
+        </div>
+
+        <!-- Nội dung Album (Main Slideshow) - Mặc định ẩn -->
+        <div id="main-content" class="opacity-0 hidden w-full h-full transition-opacity duration-1000 ease-in fixed top-0 left-0 bg-black bg-opacity-80 flex items-center justify-center">
+            
+            <!-- Top Control Buttons (Outside Carousel) -->
+            <button id="close-btn" title="Đóng album">
+                ✕
+            </button>
+            <button id="settings-btn" title="Cài đặt">
+                ⚙️
+            </button>
+
+            <!-- Navigation Buttons (Outside Carousel) -->
+            <button id="prev-btn" class="nav-btn">
+                ‹
+            </button>
+            <button id="next-btn" class="nav-btn">
+                ›
+            </button>
+
+            <!-- Main Carousel -->
+            <div id="carousel" class="relative">
+                
+                <!-- Ảnh sẽ được chèn bởi JavaScript -->
+
+                <!-- Image Indicators -->
+                <div id="image-indicator"></div>
+
+                <!-- Progress Bar for Autoplay -->
+                <div id="progress-bar"></div>
+            </div>
+
+            <!-- Control Bar (Outside Carousel) -->
+            <div id="carousel-controls">
+                <button id="music-toggle" title="Bật/tắt âm nhạc">MUSIC</button>
+                <button id="autoplay-toggle" title="Bật/tắt tự động">PLAY</button>
+                <button id="fullscreen-btn" title="Toàn màn hình">FULL</button>
+                <button id="like-btn" title="Yêu thích" data-liked="false">LIKE</button>
+                <button id="share-btn" title="Chia sẻ">SHARE</button>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal">
+            <div class="settings-content">
+                <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: bold; color: #333;">Cài Đặt</h3>
+                
+                <div class="settings-item">
+                    <label>Tốc độ Autoplay:</label>
+                    <input type="range" id="speed-slider" class="slider" min="1" max="10" value="5" title="Điều chỉnh tốc độ">
+                </div>
+
+                <div class="settings-item">
+                    <label>Âm lượng Nhạc:</label>
+                    <input type="range" id="volume-slider" class="slider" min="0" max="100" value="30" title="Điều chỉnh âm lượng">
+                </div>
+
+                <div class="settings-item">
+                    <label>Chế độ Tối:</label>
+                    <button id="dark-mode-toggle" class="toggle-btn" title="Bật/tắt chế độ tối"></button>
+                </div>
+
+                <button id="settings-close" style="width: 100%; padding: 12px; background: var(--color-ocean-blue); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 20px;">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- Cấu hình ---
+    // Đã cập nhật 9 URL ảnh thực tế của Minh Ánh
+    const IMAGE_URLS = [
+         "assets/image1.jpg",
+
+        "assets/image2.jpg",
+
+        "assets/image3.jpg",
+
+        "assets/image4.jpg",
+
+        "assets/image5.jpg",
+
+        "assets/image6.jpg",
+
+        "assets/image7.jpg",
+
+        "assets/image8.jpg",
+
+        "assets/image9.jpg"
+    ];
+    
+    let currentImageIndex = 0;
+    let autoplayInterval = null;
+    const AUTOPLAY_DELAY = 3500; // 3.5 seconds
+
+    // --- DOM Elements ---
+    const entranceScreen = document.getElementById('entrance-screen');
+    const mainContent = document.getElementById('main-content');
+    const openCardBtn = document.getElementById('open-card-btn');
+    const carousel = document.getElementById('carousel');
+    const closeBtn = document.getElementById('close-btn');
+    const settingsBtn = document.getElementById('settings-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const musicToggle = document.getElementById('music-toggle');
+    const autoplayToggle = document.getElementById('autoplay-toggle');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const likeBtn = document.getElementById('like-btn');
+    const shareBtn = document.getElementById('share-btn');
+    const imageIndicator = document.getElementById('image-indicator');
+    const progressBar = document.getElementById('progress-bar');
+    const settingsModal = document.getElementById('settings-modal');
+    const settingsClose = document.getElementById('settings-close');
+    const speedSlider = document.getElementById('speed-slider');
+    const volumeSlider = document.getElementById('volume-slider');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    // --- Background Music Setup (Using Audio Element) ---
+    const backgroundMusic = document.getElementById('background-music');
+    let musicIsPlaying = false;
+
+    // Start Background Music
+    function startMusic() {
+        if (musicIsPlaying) return;
+        backgroundMusic.currentTime = 0;
+        backgroundMusic.volume = volumeSlider.value / 100;
+        backgroundMusic.play().catch(error => {
+            console.log('Audio playback failed:', error);
+        });
+        musicIsPlaying = true;
+        musicToggle.textContent = 'MUTE';
+    }
+
+    // Stop Background Music
+    function stopMusic() {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+        musicIsPlaying = false;
+        musicToggle.textContent = 'MUSIC';
+    }
+
+    // Toggle Music
+    function toggleMusic() {
+        if (musicIsPlaying) {
+            stopMusic();
+        } else {
+            startMusic();
+        }
+    }
+
+    // --- Image Indicators ---
+    function updateIndicators() {
+        const dots = imageIndicator.querySelectorAll('.indicator-dot');
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === currentImageIndex);
+        });
+    }
+
+    function createIndicators() {
+        imageIndicator.innerHTML = '';
+        IMAGE_URLS.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.className = 'indicator-dot';
+            if (idx === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                showImage(idx);
+                updateIndicators();
+                stopAutoplay();
+            });
+            imageIndicator.appendChild(dot);
+        });
+    }
+
+    // --- Progress Bar ---
+    let progressInterval = null;
+
+    function updateProgressBar() {
+        if (!autoplayInterval) {
+            progressBar.style.width = '0%';
+            return;
+        }
+
+        const interval = 50;
+        const totalSteps = AUTOPLAY_DELAY / interval;
+        let currentStep = 0;
+
+        if (progressInterval) clearInterval(progressInterval);
+        
+        progressInterval = setInterval(() => {
+            currentStep++;
+            const percentage = (currentStep / totalSteps) * 100;
+            progressBar.style.width = Math.min(percentage, 100) + '%';
+
+            if (currentStep >= totalSteps) {
+                clearInterval(progressInterval);
+                progressBar.style.width = '0%';
+            }
+        }, interval);
+    }
+
+    // --- Toast Notification ---
+    function showToast(message, duration = 2000) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(-100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    // --- Settings Modal ---
+    function openSettings() {
+        settingsModal.classList.add('show');
+    }
+
+    function closeSettings() {
+        settingsModal.classList.remove('show');
+    }
+
+    // --- Dark Mode ---
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+    function toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        darkModeToggle.classList.toggle('active', isDarkMode);
+        localStorage.setItem('darkMode', isDarkMode);
+        showToast(isDarkMode ? 'Chế độ Tối bật' : 'Chế độ Sáng bật');
+    }
+
+    // --- Volume Control ---
+    function updateVolume() {
+        const vol = volumeSlider.value / 100;
+        backgroundMusic.volume = vol;
+        if (musicIsPlaying) {
+            showToast('Âm lượng: ' + volumeSlider.value + '%');
+        }
+    }
+
+    // --- Speed Control ---
+    function updateAutoplaySpeed() {
+        const speedValue = speedSlider.value;
+        const speed = 10 - speedValue + 1; // 1-10 scale inverse
+        AUTOPLAY_DELAY = 500 + (speed * 500); // 500ms - 5500ms
+        
+        if (autoplayInterval) {
+            stopAutoplay();
+            startAutoplay();
+        }
+        showToast('Tốc độ: ' + speedValue);
+    }
+
+    // --- Double Tap to Like ---
+    let lastTap = 0;
+    carousel.addEventListener('touchend', (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+
+        if (tapLength < 300 && tapLength > 0) {
+            // Double tap detected
+            if (likeBtn.dataset.liked !== 'true') {
+                likeBtn.click();
+            }
+        }
+        lastTap = currentTime;
+    });
+
+    // --- Pull to Refresh (Mobile) ---
+    let pullStartY = 0;
+    let isPulling = false;
+
+    mainContent.addEventListener('touchstart', (e) => {
+        pullStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    mainContent.addEventListener('touchmove', (e) => {
+        const pullY = e.changedTouches[0].clientY - pullStartY;
+        if (pullY > 50 && !isPulling) {
+            isPulling = true;
+            showToast('Kéo xuống để làm mới...');
+        }
+    }, { passive: true });
+
+    mainContent.addEventListener('touchend', (e) => {
+        const pullY = e.changedTouches[0].clientY - pullStartY;
+        if (pullY > 100) {
+            showToast('Đã làm mới!');
+            currentImageIndex = 0;
+            showImage(0);
+            updateIndicators();
+        }
+        isPulling = false;
+    }, { passive: true });
+
+    // --- Sand Particle Effect ---
+    let sandInterval = null;
+
+    function createSandParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'sand-particle';
+        
+        const randomX = Math.random() * window.innerWidth;
+        const randomDuration = 6 + Math.random() * 4; // 6-10 seconds
+        const randomDrift = (Math.random() - 0.5) * 200; // -100 to +100px drift
+        
+        particle.style.left = randomX + 'px';
+        particle.style.top = '-10px';
+        particle.style.setProperty('--drift', randomDrift + 'px');
+        particle.style.animationDuration = randomDuration + 's';
+        particle.style.animationDelay = (Math.random() * 2) + 's';
+        
+        document.body.appendChild(particle);
+        
+        // Remove particle after animation completes
+        setTimeout(() => particle.remove(), (randomDuration + 2) * 1000);
+    }
+
+    function startSandEffect() {
+        if (sandInterval) clearInterval(sandInterval);
+        // Tạo liên tục các hạt cát
+        sandInterval = setInterval(() => {
+            if (mainContent.style.display === 'flex' && Math.random() < 0.8) { // Tỉ lệ tạo hạt
+                createSandParticle();
+            }
+        }, 150); // Mỗi 150ms check tạo 1 hạt
+    }
+    
+    function stopSandEffect() {
+        if (sandInterval) clearInterval(sandInterval);
+    }
+
+    // --- Logic Carousel ---
+
+    // Load all images into carousel
+    function loadImages() {
+        IMAGE_URLS.forEach((url, index) => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Image ' + (index + 1);
+            img.className = 'carousel-item object-cover';
+            if (index === 0) img.classList.add('active');
+            carousel.appendChild(img);
+        });
+        createIndicators();
+    }
+
+    // Show specific image
+    function showImage(n) {
+        const items = carousel.querySelectorAll('.carousel-item');
+        if (!items.length) return;
+        
+        items.forEach(el => el.classList.remove('active'));
+        
+        if (n < 0) {
+            currentImageIndex = items.length - 1;
+        } else if (n >= items.length) {
+            currentImageIndex = 0;
+        } else {
+            currentImageIndex = n;
+        }
+        
+        items[currentImageIndex].classList.add('active');
+        updateIndicators();
+    }
+
+    // Navigation functions
+    function nextImage() {
+        showImage(currentImageIndex + 1);
+    }
+
+    function prevImage() {
+        showImage(currentImageIndex - 1);
+    }
+
+    // Autoplay functions
+    function startAutoplay() {
+        if (autoplayInterval) clearInterval(autoplayInterval);
+        autoplayInterval = setInterval(nextImage, AUTOPLAY_DELAY);
+        autoplayToggle.textContent = 'PAUSE';
+        updateProgressBar();
+    }
+
+    function stopAutoplay() {
+        if (autoplayInterval) {
+            clearInterval(autoplayInterval);
+            autoplayInterval = null;
+        }
+        if (progressInterval) clearInterval(progressInterval);
+        progressBar.style.width = '0%';
+        autoplayToggle.textContent = 'PLAY';
+    }
+
+    function toggleAutoplay() {
+        if (autoplayInterval) {
+            stopAutoplay();
+        } else {
+            startAutoplay();
+        }
+    }
+
+    // Confetti effect
+    function launchConfetti(element, count = 20) {
+        const rect = element.getBoundingClientRect();
+        for (let i = 0; i < count; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = (rect.left + rect.width / 2 + (Math.random() - 0.5) * 40) + 'px';
+            confetti.style.top = (rect.top + rect.height / 2) + 'px';
+            confetti.style.background = 'hsl(' + Math.floor(Math.random() * 360) + 'deg 80% 60%)';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 2000); // 2 seconds duration
+        }
+    }
+    
+    // --- Event Listeners ---
+
+    // Open Album button
+    openCardBtn.addEventListener('click', () => {
+        entranceScreen.style.opacity = '0';
+        setTimeout(() => {
+            entranceScreen.style.display = 'none';
+            mainContent.style.display = 'flex';
+            setTimeout(() => { 
+                mainContent.style.opacity = '1';
+                startAutoplay(); // Start autoplay after entrance
+                startMusic(); // Start background music
+                startSandEffect(); // Start sand particle effect
+            }, 50);
+        }, 700);
+    });
+
+    // Close modal button
+    closeBtn.addEventListener('click', () => {
+        mainContent.style.opacity = '0';
+        setTimeout(() => {
+            mainContent.style.display = 'none';
+            entranceScreen.style.display = 'flex';
+            entranceScreen.style.opacity = '1';
+            stopAutoplay();
+            if (musicIsPlaying) toggleMusic(); // Stop music when closing
+            stopSandEffect(); // Stop sand effect
+        }, 700);
+    });
+
+    // Music toggle button
+    musicToggle.addEventListener('click', toggleMusic);
+
+    // Navigation buttons
+    nextBtn.addEventListener('click', nextImage);
+    prevBtn.addEventListener('click', prevImage);
+    autoplayToggle.addEventListener('click', toggleAutoplay);
+
+    // Settings button
+    settingsBtn.addEventListener('click', openSettings);
+    settingsClose.addEventListener('click', closeSettings);
+    
+    // Settings modal close on outside click
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) closeSettings();
+    });
+
+    // Settings controls
+    speedSlider.addEventListener('input', updateAutoplaySpeed);
+    volumeSlider.addEventListener('input', updateVolume);
+    darkModeToggle.addEventListener('click', toggleDarkMode);
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+        if (mainContent.style.display === 'flex') {
+            if (e.key === 'ArrowRight') nextImage();
+            if (e.key === 'ArrowLeft') prevImage();
+            if (e.key === ' ') {
+                e.preventDefault();
+                toggleAutoplay();
+            }
+        }
+    });
+
+    // Touch swipe navigation
+    let touchStartX = 0;
+    carousel.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+
+    carousel.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchEndX - touchStartX;
+        if (diff > 50) prevImage(); // Swipe right (previous)
+        if (diff < -50) nextImage(); // Swipe left (next)
+    }, { passive: true });
+
+    // Pause autoplay on carousel hover, resume on leave
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', () => {
+        if (!autoplayInterval) startAutoplay();
+    });
+
+    // Fullscreen button
+    fullscreenBtn.addEventListener('click', async () => {
+        try {
+            if (!document.fullscreenElement) {
+                await carousel.requestFullscreen();
+                fullscreenBtn.textContent = 'EXIT';
+            } else {
+                await document.exitFullscreen();
+                fullscreenBtn.textContent = 'FULL';
+            }
+        } catch (err) {
+            console.warn('Fullscreen error:', err);
+        }
+    });
+
+    // Like button
+    likeBtn.addEventListener('click', () => {
+        const isLiked = likeBtn.dataset.liked === 'true';
+        if (isLiked) {
+            likeBtn.textContent = 'LIKE';
+            likeBtn.dataset.liked = 'false';
+        } else {
+            likeBtn.textContent = 'LIKED';
+            likeBtn.dataset.liked = 'true';
+            launchConfetti(likeBtn);
+        }
+    });
+
+    // Share button
+    shareBtn.addEventListener('click', async () => {
+        // Use custom modal message instead of alert()
+        const shareMessage = document.createElement('div');
+        shareMessage.className = 'fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-3 rounded-lg shadow-xl z-50 transition-opacity duration-300';
+        shareMessage.textContent = 'Đã sao chép liên kết Album!';
+        
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Minh Ánh Album',
+                    text: 'Album những khoảnh khắc yêu thương',
+                    url: window.location.href
+                });
+            } catch (err) {
+                console.warn('Share error:', err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                document.body.appendChild(shareMessage);
+                setTimeout(() => shareMessage.remove(), 2000);
+            } catch (err) {
+                // Fallback for environment without clipboard access
+                prompt('Sao chép liên kết này:', window.location.href); 
+            }
+        }
+    });
+
+    // Initialize
+    window.addEventListener('load', () => {
+        loadImages();
+        
+        // Apply dark mode if saved
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.classList.add('active');
+        }
+        
+        // Set initial volume
+        backgroundMusic.volume = volumeSlider.value / 100;
+    });
+</script>
+</body>
+</html>
