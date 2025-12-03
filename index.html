@@ -226,6 +226,29 @@
             z-index: 999;
         }
 
+        /* Heart icon animation */
+        @keyframes heart-rise {
+            0% {
+                transform: translateY(0) translateX(0) scale(0.8);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(var(--heart-drift)) scale(1.2);
+                opacity: 0;
+            }
+        }
+        .heart-icon {
+            position: fixed;
+            font-size: 32px;
+            pointer-events: none;
+            animation: heart-rise 1.2s ease-out forwards;
+            z-index: 999;
+            filter: drop-shadow(0 0 8px rgba(255, 20, 147, 0.8));
+        }
+
         /* Sand Particle Effect (Ánh sáng lấp lánh/hạt cát) */
         @keyframes sand-fall {
             0% {
@@ -505,33 +528,34 @@
 
         /* Open Card Button Styling */
         #open-card-btn {
-            display: inline-block;
-            padding: 12px 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             color: #ffffff;
             font-weight: 700;
-            border-radius: 30px;
-            font-size: 16px;
+            border-radius: 50%;
+            font-size: 32px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            text-transform: uppercase;
-            letter-spacing: 1px;
             -webkit-appearance: none;
             appearance: none;
         }
 
         #open-card-btn:hover {
             background: rgba(255, 255, 255, 0.35);
-            transform: translateY(-2px);
+            transform: scale(1.1);
             box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
         }
 
         #open-card-btn:active {
-            transform: translateY(0);
+            transform: scale(0.95);
             background: rgba(255, 255, 255, 0.3);
         }
 
@@ -559,7 +583,7 @@
                 <h2 class="text-5xl sm:text-6xl font-bold gradient-text">From Cô Tô with love</h2>
                 <p class="text-white">_tmanh410_</p>
                 <button id="open-card-btn" style="background: rgba(255, 255, 255, 0.25); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.4);">
-                    Bắt Đầu
+                    ▶️
                 </button>
             </div>
         </div>
@@ -597,11 +621,11 @@
 
             <!-- Control Bar (Outside Carousel) -->
             <div id="carousel-controls">
-                <button id="music-toggle" title="Bật/tắt âm nhạc">MUSIC</button>
-                <button id="autoplay-toggle" title="Bật/tắt tự động">PLAY</button>
-                <button id="fullscreen-btn" title="Toàn màn hình">FULL</button>
-                <button id="like-btn" title="Yêu thích" data-liked="false">LIKE</button>
-                <button id="share-btn" title="Chia sẻ">SHARE</button>
+                <button id="music-toggle" title="Bật/tắt âm nhạc">🔊</button>
+                <button id="autoplay-toggle" title="Bật/tắt tự động">⏯️</button>
+                <button id="fullscreen-btn" title="Toàn màn hình">⛶</button>
+                <button id="like-btn" title="Yêu thích" data-liked="false">🤍</button>
+                <button id="share-btn" title="Chia sẻ">↗️</button>
             </div>
         </div>
 
@@ -694,7 +718,7 @@
             console.log('Audio playback failed:', error);
         });
         musicIsPlaying = true;
-        musicToggle.textContent = 'MUTE';
+        musicToggle.textContent = '🔊';
     }
 
     // Stop Background Music
@@ -702,7 +726,7 @@
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
         musicIsPlaying = false;
-        musicToggle.textContent = 'MUSIC';
+        musicToggle.textContent = '🔇';
     }
 
     // Toggle Music
@@ -820,19 +844,85 @@
         showToast('Tốc độ: ' + speedValue);
     }
 
-    // --- Double Tap to Like ---
+    // --- Double Tap/Double Click to Like ---
     let lastTap = 0;
-    carousel.addEventListener('touchend', (e) => {
+    let tapTimeout = null;
+    let tapX = 0;
+    let tapY = 0;
+
+    // Hàm hiển thị icon trái tim tại vị trí tap/click
+    function showLikeEffect(x, y) {
+        // Tạo nhiều icon trái tim với vị trí và animation khác nhau
+        const heartCount = 5;
+        for (let i = 0; i < heartCount; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-icon';
+            heart.textContent = '❤️';
+            
+            // Vị trí ngẫu nhiên xung quanh điểm tap
+            const offsetX = (Math.random() - 0.5) * 60;
+            const offsetY = (Math.random() - 0.5) * 30;
+            const randomDrift = (Math.random() - 0.5) * 80;
+            
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.setProperty('--heart-drift', randomDrift + 'px');
+            heart.style.animationDelay = (i * 0.1) + 's';
+            heart.style.fontSize = (24 + Math.random() * 16) + 'px';
+            
+            document.body.appendChild(heart);
+            
+            // Xóa sau khi animation kết thúc
+            setTimeout(() => heart.remove(), 1200);
+        }
+    }
+
+    // Xử lý double tap trên mobile (touch)
+    mainContent.addEventListener('touchstart', (e) => {
+        tapX = e.changedTouches[0].clientX;
+        tapY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    mainContent.addEventListener('touchend', (e) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTap;
 
-        if (tapLength < 300 && tapLength > 0) {
-            // Double tap detected
-            if (likeBtn.dataset.liked !== 'true') {
-                likeBtn.click();
-            }
+        // Hủy timeout nếu có
+        if (tapTimeout) {
+            clearTimeout(tapTimeout);
+            tapTimeout = null;
         }
-        lastTap = currentTime;
+
+        if (tapLength < 300 && tapLength > 0) {
+            // Double tap detected - toggle like
+            e.preventDefault();
+            e.stopPropagation();
+            const wasLiked = likeBtn.dataset.liked === 'true';
+            likeBtn.click();
+            // Hiển thị hiệu ứng tại vị trí tap
+            showLikeEffect(tapX, tapY);
+            lastTap = 0; // Reset để tránh trigger nhiều lần
+        } else {
+            // Single tap - đợi một chút để xem có double tap không
+            tapTimeout = setTimeout(() => {
+                lastTap = 0;
+            }, 300);
+            lastTap = currentTime;
+        }
+    }, { passive: false });
+
+    // Xử lý double click trên desktop (mouse)
+    mainContent.addEventListener('dblclick', (e) => {
+        // Chỉ xử lý khi click vào carousel hoặc vùng ảnh
+        const target = e.target;
+        if (target.closest('#carousel') || target.classList.contains('carousel-item')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const wasLiked = likeBtn.dataset.liked === 'true';
+            likeBtn.click();
+            // Hiển thị hiệu ứng tại vị trí click
+            showLikeEffect(e.clientX, e.clientY);
+        }
     });
 
     // --- Pull to Refresh (Mobile) ---
@@ -946,7 +1036,7 @@
     function startAutoplay() {
         if (autoplayInterval) clearInterval(autoplayInterval);
         autoplayInterval = setInterval(nextImage, AUTOPLAY_DELAY);
-        autoplayToggle.textContent = 'PAUSE';
+        autoplayToggle.textContent = '⏸️';
         updateProgressBar();
     }
 
@@ -957,7 +1047,7 @@
         }
         if (progressInterval) clearInterval(progressInterval);
         progressBar.style.width = '0%';
-        autoplayToggle.textContent = 'PLAY';
+        autoplayToggle.textContent = '⏯️';
     }
 
     function toggleAutoplay() {
@@ -1070,10 +1160,10 @@
         try {
             if (!document.fullscreenElement) {
                 await carousel.requestFullscreen();
-                fullscreenBtn.textContent = 'EXIT';
+                fullscreenBtn.textContent = '⛶';
             } else {
                 await document.exitFullscreen();
-                fullscreenBtn.textContent = 'FULL';
+                fullscreenBtn.textContent = '⛶';
             }
         } catch (err) {
             console.warn('Fullscreen error:', err);
@@ -1084,10 +1174,10 @@
     likeBtn.addEventListener('click', () => {
         const isLiked = likeBtn.dataset.liked === 'true';
         if (isLiked) {
-            likeBtn.textContent = 'LIKE';
+            likeBtn.textContent = '🤍';
             likeBtn.dataset.liked = 'false';
         } else {
-            likeBtn.textContent = 'LIKED';
+            likeBtn.textContent = '❤️';
             likeBtn.dataset.liked = 'true';
             launchConfetti(likeBtn);
         }
