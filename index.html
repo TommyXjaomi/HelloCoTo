@@ -503,6 +503,35 @@
             font-weight: 300;
         }
 
+        /* Open Card Button Styling */
+        #open-card-btn {
+            padding: 12px 32px !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            border-radius: 30px !important;
+            font-size: 16px !important;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #open-card-btn:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        }
+
+        #open-card-btn:active {
+            transform: translateY(0);
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -526,7 +555,7 @@
             <div class="glass-container">
                 <h2 class="text-5xl sm:text-6xl font-bold gradient-text">From Cô Tô with love</h2>
                 <p class="text-white">_tmanh410_</p>
-                <button id="open-card-btn" class="px-12 py-3 bg-white bg-opacity-20 backdrop-blur-md border border-white border-opacity-30 text-white font-bold rounded-full hover:bg-opacity-30 shadow-2xl text-base sm:text-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1 active:translate-y-0">
+                <button id="open-card-btn">
                     Bắt Đầu
                 </button>
             </div>
